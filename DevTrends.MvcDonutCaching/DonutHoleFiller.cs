@@ -9,6 +9,8 @@ namespace DevTrends.MvcDonutCaching
 {
     public class DonutHoleFiller : IDonutHoleFiller
     {
+        private const string RouteValueDictionaryAreaKeyName = "area";
+
         private static readonly Regex DonutHoles = new Regex("<!--Donut#(.*?)#-->(.*?)<!--EndDonut-->", RegexOptions.Compiled | RegexOptions.Singleline);
 
         private readonly IActionSettingsSerialiser _actionSettingsSerialiser;
@@ -52,12 +54,13 @@ namespace DevTrends.MvcDonutCaching
                     filterContext.Controller,
                     actionSettings.ActionName,
                     actionSettings.ControllerName,
+                    actionSettings.ControllerArea,
                     actionSettings.RouteValues
                 );
             });
         }
 
-        private static string InvokeAction(ControllerBase controller, string actionName, string controllerName, RouteValueDictionary routeValues)
+        private static string InvokeAction(ControllerBase controller, string actionName, string controllerName, string controllerArea, RouteValueDictionary routeValues)
         {
             var viewContext = new ViewContext(
                 controller.ControllerContext,
@@ -68,7 +71,10 @@ namespace DevTrends.MvcDonutCaching
             );
 
             var htmlHelper = new HtmlHelper(viewContext, new ViewPage());
-
+            if (routeValues != null)
+            {
+                routeValues[RouteValueDictionaryAreaKeyName] = controllerArea;
+            }
             return htmlHelper.Action(actionName, controllerName, routeValues).ToString();
         }
     }
