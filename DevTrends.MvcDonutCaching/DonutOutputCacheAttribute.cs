@@ -12,14 +12,14 @@ namespace DevTrends.MvcDonutCaching
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class DonutOutputCacheAttribute : ActionFilterAttribute, IExceptionFilter
     {
-        // Private
-        private readonly ICacheHeadersHelper _cacheHeadersHelper;
-        private readonly ICacheSettingsManager _cacheSettingsManager;
-        private readonly IDonutHoleFiller _donutHoleFiller;
-        private readonly IKeyGenerator _keyGenerator;
-        private readonly IReadWriteOutputCacheManager _outputCacheManager;
-        private readonly IList<Func<ActionExecutingContext, bool>> _cachedActionsFilters;
-        private CacheSettings _cacheSettings;
+        // Protected
+        protected readonly ICacheHeadersHelper CacheHeadersHelper;
+        protected readonly ICacheSettingsManager CacheSettingsManager;
+        protected readonly IDonutHoleFiller DonutHoleFiller;
+        protected readonly IKeyGenerator KeyGenerator;
+        protected readonly IReadWriteOutputCacheManager OutputCacheManager;
+        protected readonly IList<Func<ActionExecutingContext, bool>> CachedActionsFilters;
+        protected CacheSettings CacheSettings;
 
         // Private
         private bool? _noStore;
@@ -65,13 +65,13 @@ namespace DevTrends.MvcDonutCaching
                                            ? cacheConfiguration.CachedActionsFiltersConfiguration.CachedActionsFilters
                                            : MvcDonutCaching.CachedActionsFiltersConfiguration.CachedActionsFilters;
 
-            _keyGenerator = new KeyGenerator(keyBuilder);
-            _outputCacheManager = new OutputCacheManager(OutputCache.Instance, keyBuilder);
-            _donutHoleFiller =
+            KeyGenerator = new KeyGenerator(keyBuilder);
+            OutputCacheManager = new OutputCacheManager(OutputCache.Instance, keyBuilder);
+            DonutHoleFiller =
                 new DonutHoleFiller(new EncryptingActionSettingsSerialiser(actionSettingsSerialiser, encryptor));
-            _cacheSettingsManager = new CacheSettingsManager();
-            _cacheHeadersHelper = new CacheHeadersHelper();
-            _cachedActionsFilters = cachedActionsFilters.Select(x => x).ToList();
+            CacheSettingsManager = new CacheSettingsManager();
+            CacheHeadersHelper = new CacheHeadersHelper();
+            CachedActionsFilters = cachedActionsFilters.Select(x => x).ToList();
 
             Duration = -1;
             Location = (OutputCacheLocation)(-1);
@@ -156,7 +156,7 @@ namespace DevTrends.MvcDonutCaching
 
         public void OnException(ExceptionContext filterContext)
         {
-            if (_cacheSettings != null)
+            if (CacheSettings != null)
             {
                 ExecuteCallback(filterContext, true);
             }
@@ -168,23 +168,23 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="filterContext">The filter context.</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            _cacheSettings = BuildCacheSettings();
+            CacheSettings = BuildCacheSettings();
 
-            var cacheKey = _keyGenerator.GenerateKey(filterContext, _cacheSettings);
+            var cacheKey = KeyGenerator.GenerateKey(filterContext, CacheSettings);
 
             // Are we actually storing data on the server side ?
-            if (_cacheSettings.IsServerCachingEnabled)
+            if (CacheSettings.IsServerCachingEnabled)
             {
                 CacheItem cachedItem = null;
 
                 // If the request is a POST, we lookup for NoCacheLookupForPosts option
                 // We are fetching the stored value only if the option has not been set and the request is not a POST
                 if (
-                    (_cacheSettings.Options & OutputCacheOptions.NoCacheLookupForPosts) != OutputCacheOptions.NoCacheLookupForPosts ||
+                    (CacheSettings.Options & OutputCacheOptions.NoCacheLookupForPosts) != OutputCacheOptions.NoCacheLookupForPosts ||
                     filterContext.HttpContext.Request.HttpMethod != "POST"
                 )
                 {
-                    cachedItem = _outputCacheManager.GetItem(cacheKey);
+                    cachedItem = OutputCacheManager.GetItem(cacheKey);
                 }
 
                 // We have a cached version on the server side
@@ -194,7 +194,7 @@ namespace DevTrends.MvcDonutCaching
                     // The MVC action won't execute as we injected the previous cached result.
                     filterContext.Result = new ContentResult
                     {
-                        Content = _donutHoleFiller.ReplaceDonutHoleContent(cachedItem.Content, filterContext, _cacheSettings.Options),
+                        Content = DonutHoleFiller.ReplaceDonutHoleContent(cachedItem.Content, filterContext, CacheSettings.Options),
                         ContentType = cachedItem.ContentType
                     };
                 }
@@ -230,7 +230,7 @@ namespace DevTrends.MvcDonutCaching
 
                 // Disabling caching on actions by configured filters.
                 var allCachedActionsFilterReturnedTrue =
-                    _cachedActionsFilters.All(cachedActionsFilter => cachedActionsFilter(filterContext));
+                    CachedActionsFilters.All(cachedActionsFilter => cachedActionsFilter(filterContext));
 
                 // Now we use owned caching writer to actually store data
                 var cacheItem = new CacheItem
@@ -240,12 +240,12 @@ namespace DevTrends.MvcDonutCaching
                 };
 
                 filterContext.HttpContext.Response.Write(
-                    _donutHoleFiller.RemoveDonutHoleWrappers(cacheItem.Content, filterContext, _cacheSettings.Options)
+                    DonutHoleFiller.RemoveDonutHoleWrappers(cacheItem.Content, filterContext, CacheSettings.Options)
                 );
 
-                if (_cacheSettings.IsServerCachingEnabled && allCachedActionsFilterReturnedTrue && filterContext.HttpContext.Response.StatusCode == 200)
+                if (CacheSettings.IsServerCachingEnabled && allCachedActionsFilterReturnedTrue && filterContext.HttpContext.Response.StatusCode == 200)
                 {
-                    _outputCacheManager.AddItem(cacheKey, cacheItem, DateTime.UtcNow.AddSeconds(_cacheSettings.Duration));
+                    OutputCacheManager.AddItem(cacheKey, cacheItem, DateTime.UtcNow.AddSeconds(CacheSettings.Duration));
                 }
             });
         }
@@ -256,7 +256,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="filterContext">The filter context.</param>
         public override void OnResultExecuted(ResultExecutedContext filterContext)
         {
-            if (_cacheSettings == null)
+            if (CacheSettings == null)
             {
                 return;
             }
@@ -268,7 +268,7 @@ namespace DevTrends.MvcDonutCaching
             // the right HTTP Cache headers for the final response.
             if (!filterContext.IsChildAction)
             {
-                _cacheHeadersHelper.SetCacheHeaders(filterContext.HttpContext.Response, _cacheSettings);
+                CacheHeadersHelper.SetCacheHeaders(filterContext.HttpContext.Response, CacheSettings);
             }
         }
 
@@ -287,7 +287,7 @@ namespace DevTrends.MvcDonutCaching
             {
                 cacheSettings = new CacheSettings
                 {
-                    IsCachingEnabled = _cacheSettingsManager.IsCachingEnabledGlobally,
+                    IsCachingEnabled = CacheSettingsManager.IsCachingEnabledGlobally,
                     Duration = Duration,
                     VaryByCustom = VaryByCustom,
                     VaryByParam = VaryByParam,
@@ -298,11 +298,11 @@ namespace DevTrends.MvcDonutCaching
             }
             else
             {
-                var cacheProfile = _cacheSettingsManager.RetrieveOutputCacheProfile(CacheProfile);
+                var cacheProfile = CacheSettingsManager.RetrieveOutputCacheProfile(CacheProfile);
 
                 cacheSettings = new CacheSettings
                 {
-                    IsCachingEnabled = _cacheSettingsManager.IsCachingEnabledGlobally && cacheProfile.Enabled,
+                    IsCachingEnabled = CacheSettingsManager.IsCachingEnabledGlobally && cacheProfile.Enabled,
                     Duration = Duration == -1 ? cacheProfile.Duration : Duration,
                     VaryByCustom = VaryByCustom ?? cacheProfile.VaryByCustom,
                     VaryByParam = VaryByParam ?? cacheProfile.VaryByParam,
@@ -332,7 +332,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="hasErrors">if set to <c>true</c> [has errors].</param>
         private void ExecuteCallback(ControllerContext context, bool hasErrors)
         {
-            var cacheKey = _keyGenerator.GenerateKey(context, _cacheSettings);
+            var cacheKey = KeyGenerator.GenerateKey(context, CacheSettings);
 
             var callback = context.HttpContext.Items[cacheKey] as Action<bool>;
 
