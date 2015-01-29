@@ -11,6 +11,8 @@ namespace DevTrends.MvcDonutCaching
         private static readonly IActionSettingsSerialiser DefaultActionSettingsSerialiser = new ActionSettingsSerialiser();
         private static readonly IActionSettingsSerialiser DefaultEncryptingActionSettingsSerialiser =
             new EncryptingActionSettingsSerialiser(ActionSettingsSerialiser, Encryptor);
+        private static readonly ICachedActionsFiltersConfiguration DefaultCachedActionsFiltersConfiguration =
+            new CachedActionsFiltersConfiguration();
 
         private static IActionSettingsSerialiser _encryptingActionSettingsSerialiser;
 
@@ -63,6 +65,18 @@ namespace DevTrends.MvcDonutCaching
                 }
 
                 return DefaultActionSettingsSerialiser;
+            }
+        }
+
+        public static ICachedActionsFiltersConfiguration CachedActionsFiltersConfiguration
+        {
+            get
+            {
+                if (_configuration != null && _configuration.CachedActionsFiltersConfiguration != null)
+                {
+                    return _configuration.CachedActionsFiltersConfiguration;
+                }
+                return DefaultCachedActionsFiltersConfiguration;
             }
         }
 

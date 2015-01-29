@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
@@ -16,6 +18,7 @@ namespace DevTrends.MvcDonutCaching
         private readonly IDonutHoleFiller _donutHoleFiller;
         private readonly IKeyGenerator _keyGenerator;
         private readonly IReadWriteOutputCacheManager _outputCacheManager;
+        private readonly IList<Func<ActionExecutingContext, bool>> _cachedActionsFilters;
         private CacheSettings _cacheSettings;
 
         // Private
@@ -56,12 +59,19 @@ namespace DevTrends.MvcDonutCaching
                                 ? cacheConfiguration.Encryptor
                                 : MvcDonutCaching.Encryptor;
 
+            var cachedActionsFilters = cacheConfiguration != null &&
+                                       cacheConfiguration.CachedActionsFiltersConfiguration != null &&
+                                       cacheConfiguration.CachedActionsFiltersConfiguration.CachedActionsFilters != null
+                                           ? cacheConfiguration.CachedActionsFiltersConfiguration.CachedActionsFilters
+                                           : MvcDonutCaching.CachedActionsFiltersConfiguration.CachedActionsFilters;
+
             _keyGenerator = new KeyGenerator(keyBuilder);
             _outputCacheManager = new OutputCacheManager(OutputCache.Instance, keyBuilder);
             _donutHoleFiller =
                 new DonutHoleFiller(new EncryptingActionSettingsSerialiser(actionSettingsSerialiser, encryptor));
             _cacheSettingsManager = new CacheSettingsManager();
             _cacheHeadersHelper = new CacheHeadersHelper();
+            _cachedActionsFilters = cachedActionsFilters.Select(x => x).ToList();
 
             Duration = -1;
             Location = (OutputCacheLocation)(-1);
@@ -216,6 +226,11 @@ namespace DevTrends.MvcDonutCaching
                 if (hasErrors)
                 {
                     return; // Something went wrong, we are not going to cache something bad
+                }
+
+                if (_cachedActionsFilters.Any(cachedActionsFilter => !cachedActionsFilter(filterContext)))
+                {
+                    return;
                 }
 
                 // Now we use owned caching writer to actually store data
