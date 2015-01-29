@@ -228,10 +228,9 @@ namespace DevTrends.MvcDonutCaching
                     return; // Something went wrong, we are not going to cache something bad
                 }
 
-                if (_cachedActionsFilters.Any(cachedActionsFilter => !cachedActionsFilter(filterContext)))
-                {
-                    return;
-                }
+                // Disabling caching on actions by configured filters.
+                var allCachedActionsFilterReturnedTrue =
+                    _cachedActionsFilters.All(cachedActionsFilter => cachedActionsFilter(filterContext));
 
                 // Now we use owned caching writer to actually store data
                 var cacheItem = new CacheItem
@@ -244,7 +243,7 @@ namespace DevTrends.MvcDonutCaching
                     _donutHoleFiller.RemoveDonutHoleWrappers(cacheItem.Content, filterContext, _cacheSettings.Options)
                 );
 
-                if (_cacheSettings.IsServerCachingEnabled && filterContext.HttpContext.Response.StatusCode == 200)
+                if (_cacheSettings.IsServerCachingEnabled && allCachedActionsFilterReturnedTrue && filterContext.HttpContext.Response.StatusCode == 200)
                 {
                     _outputCacheManager.AddItem(cacheKey, cacheItem, DateTime.UtcNow.AddSeconds(_cacheSettings.Duration));
                 }
