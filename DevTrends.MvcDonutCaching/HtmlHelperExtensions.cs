@@ -7,18 +7,9 @@ namespace DevTrends.MvcDonutCaching
 {
     public static class HtmlHelperExtensions
     {
-        private static IActionSettingsSerialiser _serialiser;
-
         public static IActionSettingsSerialiser Serialiser
         {
-            get
-            {
-                return _serialiser ??  (_serialiser = new EncryptingActionSettingsSerialiser(new ActionSettingsSerialiser(), new Encryptor()));
-            }
-            set
-            {
-                _serialiser = value;
-            }
+            get { return MvcDonutCaching.EncryptingActionSettingsSerialiser; }
         }
 
         /// <summary>
