@@ -162,7 +162,8 @@ namespace DevTrends.MvcDonutCaching
                 htmlHelper.ViewContext.Writer.Write("<!--Donut#{0}#-->", serialisedActionSettings);
             }
 
-            htmlHelper.RenderAction(actionName, controllerName, routeValues);
+            var routeValuesCopy = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
+            htmlHelper.RenderAction(actionName, controllerName, routeValuesCopy);
 
             if (excludeFromParentCache)
             {
@@ -183,14 +184,25 @@ namespace DevTrends.MvcDonutCaching
         public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, [AspMvcAreaAttribute] string controllerArea,
             RouteValueDictionary routeValues, bool excludeFromParentCache)
         {
+            var routeValuesCopy = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
+
             if (excludeFromParentCache)
             {
                 var serialisedActionSettings = GetSerialisedActionSettings(actionName, controllerName, controllerArea, routeValues);
 
-                return new MvcHtmlString(string.Format("<!--Donut#{0}#-->{1}<!--EndDonut-->", serialisedActionSettings, htmlHelper.Action(actionName, controllerName, routeValues)));
+                return new MvcHtmlString(string.Format("<!--Donut#{0}#-->{1}<!--EndDonut-->", serialisedActionSettings, htmlHelper.Action(actionName, controllerName, routeValuesCopy)));
             }
 
-            return htmlHelper.Action(actionName, controllerName, routeValues);
+            return htmlHelper.Action(actionName, controllerName, routeValuesCopy);
+        }
+
+        private static RouteValueDictionary GetCopyOfRouteValueDictionaryWithControllerAreaValue(
+            RouteValueDictionary routeValues, [AspMvcAreaAttribute] string controllerArea)
+        {
+            var routeValuesCopy = new RouteValueDictionary(routeValues);
+            routeValuesCopy["Area"] = controllerArea;
+
+            return routeValuesCopy;
         }
 
         private static string GetSerialisedActionSettings(string actionName, string controllerName, string controllerArea, RouteValueDictionary routeValues)
