@@ -26,21 +26,12 @@ namespace DevTrends.MvcDonutCaching
         public string ControllerName { get; set; }
 
         /// <summary>
-        /// Get or sets the controller area.
-        /// </summary>
-        /// <value>
-        /// The controller's area.
-        /// </value>
-        [DataMember(Order = 3)]
-        public string ControllerArea { get; set; }
-
-        /// <summary>
         /// Gets or sets the route values.
         /// </summary>
         /// <value>
         /// The route values.
         /// </value>
-        [DataMember(Order = 4)]
+        [DataMember(Order = 3)]
         public RouteValueDictionary RouteValues { get; set; }
     }
 }

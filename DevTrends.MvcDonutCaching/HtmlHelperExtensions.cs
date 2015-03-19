@@ -7,6 +7,8 @@ namespace DevTrends.MvcDonutCaching
 {
     public static class HtmlHelperExtensions
     {
+        public const string RouteValuesDictionaryAreaKey = "Area";
+
         public static IActionSettingsSerialiser Serialiser
         {
             get { return MvcDonutCaching.EncryptingActionSettingsSerialiser; }
@@ -155,15 +157,15 @@ namespace DevTrends.MvcDonutCaching
         public static void RenderAction(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, [AspMvcAreaAttribute] string controllerArea,
             RouteValueDictionary routeValues, bool excludeFromParentCache)
         {
+            var routeValuesWithArea = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
             if (excludeFromParentCache)
             {
-                var serialisedActionSettings = GetSerialisedActionSettings(actionName, controllerName, controllerArea, routeValues);
+                var serialisedActionSettings = GetSerialisedActionSettings(actionName, controllerName, routeValuesWithArea);
 
                 htmlHelper.ViewContext.Writer.Write("<!--Donut#{0}#-->", serialisedActionSettings);
             }
 
-            var routeValuesCopy = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
-            htmlHelper.RenderAction(actionName, controllerName, routeValuesCopy);
+            htmlHelper.RenderAction(actionName, controllerName, routeValuesWithArea);
 
             if (excludeFromParentCache)
             {
@@ -184,34 +186,36 @@ namespace DevTrends.MvcDonutCaching
         public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, [AspMvcAreaAttribute] string controllerArea,
             RouteValueDictionary routeValues, bool excludeFromParentCache)
         {
-            var routeValuesCopy = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
+            var routeValuesWithArea = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
 
             if (excludeFromParentCache)
             {
-                var serialisedActionSettings = GetSerialisedActionSettings(actionName, controllerName, controllerArea, routeValues);
+                var serialisedActionSettings = GetSerialisedActionSettings(actionName, controllerName, routeValuesWithArea);
 
-                return new MvcHtmlString(string.Format("<!--Donut#{0}#-->{1}<!--EndDonut-->", serialisedActionSettings, htmlHelper.Action(actionName, controllerName, routeValuesCopy)));
+                return new MvcHtmlString(string.Format("<!--Donut#{0}#-->{1}<!--EndDonut-->", serialisedActionSettings, htmlHelper.Action(actionName, controllerName, routeValuesWithArea)));
             }
 
-            return htmlHelper.Action(actionName, controllerName, routeValuesCopy);
+            return htmlHelper.Action(actionName, controllerName, routeValuesWithArea);
         }
 
         private static RouteValueDictionary GetCopyOfRouteValueDictionaryWithControllerAreaValue(
             RouteValueDictionary routeValues, [AspMvcAreaAttribute] string controllerArea)
         {
             var routeValuesCopy = new RouteValueDictionary(routeValues);
-            routeValuesCopy["Area"] = controllerArea;
+            if (controllerArea != null)
+            {
+                routeValuesCopy[RouteValuesDictionaryAreaKey] = controllerArea;
+            }
 
             return routeValuesCopy;
         }
 
-        private static string GetSerialisedActionSettings(string actionName, string controllerName, string controllerArea, RouteValueDictionary routeValues)
+        private static string GetSerialisedActionSettings(string actionName, string controllerName, RouteValueDictionary routeValues)
         {
             var actionSettings = new ActionSettings
             {
                 ActionName = actionName,
                 ControllerName = controllerName,
-                ControllerArea = controllerArea,
                 RouteValues = routeValues
             };
 
