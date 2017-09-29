@@ -1,6 +1,5 @@
 ﻿using System.Web.Mvc;
 using Autofac;
-using DevTrends.MvcDonutCaching.Annotations;
 
 namespace DevTrends.MvcDonutCaching.Demo.Mvc
 {
@@ -15,7 +14,6 @@ namespace DevTrends.MvcDonutCaching.Demo.Mvc
         public OutputCacheManager OutputCacheManager
         {
             get;
-            [UsedImplicitly]
             set;
         }
     }

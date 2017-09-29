@@ -201,6 +201,9 @@ namespace DevTrends.MvcDonutCaching
         private static RouteValueDictionary GetCopyOfRouteValueDictionaryWithControllerAreaValue(
             RouteValueDictionary routeValues, [AspMvcAreaAttribute] string controllerArea)
         {
+            if (routeValues == null)
+                return null;
+
             var routeValuesCopy = new RouteValueDictionary(routeValues);
             if (controllerArea != null)
             {
