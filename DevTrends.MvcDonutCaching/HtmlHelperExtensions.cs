@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
-using DevTrends.MvcDonutCaching.Annotations;
+using JetBrains.Annotations;
 
 namespace DevTrends.MvcDonutCaching
 {

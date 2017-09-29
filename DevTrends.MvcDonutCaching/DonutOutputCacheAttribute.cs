@@ -99,6 +99,15 @@ namespace DevTrends.MvcDonutCaching
         /// <summary>
         /// Gets or sets the vary-by-custom value.
         /// </summary>
+        public string VaryByHeader
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the vary-by-custom value.
+        /// </summary>
         public string VaryByCustom
         {
             get;
@@ -171,6 +180,12 @@ namespace DevTrends.MvcDonutCaching
             CacheSettings = BuildCacheSettings();
 
             var cacheKey = KeyGenerator.GenerateKey(filterContext, CacheSettings);
+
+            // Are we actually storing data on the server side ?
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                return;
+            }
 
             // Are we actually storing data on the server side ?
             if (CacheSettings.IsServerCachingEnabled)
@@ -291,6 +306,7 @@ namespace DevTrends.MvcDonutCaching
                     Duration = Duration,
                     VaryByCustom = VaryByCustom,
                     VaryByParam = VaryByParam,
+                    VaryByHeader     = VaryByHeader,
                     Location = (int)Location == -1 ? OutputCacheLocation.Server : Location,
                     NoStore = NoStore,
                     Options = Options,
@@ -306,6 +322,7 @@ namespace DevTrends.MvcDonutCaching
                     Duration = Duration == -1 ? cacheProfile.Duration : Duration,
                     VaryByCustom = VaryByCustom ?? cacheProfile.VaryByCustom,
                     VaryByParam = VaryByParam ?? cacheProfile.VaryByParam,
+                    VaryByHeader     = VaryByHeader ?? cacheProfile.VaryByHeader,
                     Location = (int)Location == -1 ? ((int)cacheProfile.Location == -1 ? OutputCacheLocation.Server : cacheProfile.Location) : Location,
                     NoStore = _noStore.HasValue ? _noStore.Value : cacheProfile.NoStore,
                     Options = Options,
@@ -333,6 +350,11 @@ namespace DevTrends.MvcDonutCaching
         private void ExecuteCallback(ControllerContext context, bool hasErrors)
         {
             var cacheKey = KeyGenerator.GenerateKey(context, CacheSettings);
+
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                return;
+            }
 
             var callback = context.HttpContext.Items[cacheKey] as Action<bool>;
 

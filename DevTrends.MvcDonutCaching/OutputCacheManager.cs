@@ -1,9 +1,9 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Caching;
 using System.Web.Routing;
-using DevTrends.MvcDonutCaching.Annotations;
 
 namespace DevTrends.MvcDonutCaching
 {
@@ -23,11 +23,35 @@ namespace DevTrends.MvcDonutCaching
             _keyBuilder = keyBuilder;
         }
 
+        /// <summary>
+        /// Gets the key builder.
+        /// </summary>
+        /// <value>
+        /// The key builder.
+        /// </value>
+        public IKeyBuilder KeyBuilder
+        {
+            get { return _keyBuilder; }
+        }
+
+        /// <summary>
+        /// Add sthe given <see cref="cacheItem" /> in the cache.
+        /// </summary>
+        /// <param name="key">The cache key to add.</param>
+        /// <param name="cacheItem">The cache item to add.</param>
+        /// <param name="utcExpiry">The cache item UTC expiry date and time.</param>
         public void AddItem(string key, CacheItem cacheItem, DateTime utcExpiry)
         {
             _outputCacheProvider.Add(key, cacheItem, utcExpiry);
         }
 
+        /// <summary>
+        /// Retrieves a cache item the given the <see cref="key" />.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns>
+        /// A <see cref="CacheItem" /> instance on cache hit, null otherwise.
+        /// </returns>
         public CacheItem GetItem(string key)
         {
             return _outputCacheProvider.Get(key) as CacheItem;
@@ -114,7 +138,7 @@ namespace DevTrends.MvcDonutCaching
         public void RemoveItems([AspMvcController] string controllerName, [AspMvcAction] string actionName, RouteValueDictionary routeValues)
         {
             var enumerableCache = _outputCacheProvider as IEnumerable<KeyValuePair<string, object>>;
-
+            
             if (enumerableCache == null)
             {
                 throw new NotSupportedException("Ensure that your custom OutputCacheProvider implements IEnumerable<KeyValuePair<string, object>>.");
@@ -135,6 +159,17 @@ namespace DevTrends.MvcDonutCaching
             {
                 foreach (var routeValue in routeValues)
                 {
+                    // Ignoring the "area" part of the route values if it's an empty string
+                    // Ref : https://github.com/moonpyk/mvcdonutcaching/issues/36
+                    if (routeValue.Key == KeyGenerator.DataTokensKeyArea)
+                    {
+                        var areaString = routeValue.Value as string;
+                        if (string.IsNullOrWhiteSpace(areaString))
+                        {
+                            continue;
+                        }
+                    }
+
                     var keyFrag = _keyBuilder.BuildKeyFragment(routeValue);
 
                     if (string.IsNullOrEmpty(keyFrag))
