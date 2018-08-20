@@ -1,7 +1,6 @@
 ﻿using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
-using JetBrains.Annotations;
 
 namespace DevTrends.MvcDonutCaching
 {
@@ -21,7 +20,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="actionName">The name of the action method to invoke.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
         /// <returns>The child action result as an HTML string.</returns>
-        public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, bool excludeFromParentCache)
+        public static MvcHtmlString Action(this HtmlHelper htmlHelper, string actionName, bool excludeFromParentCache)
         {
             return htmlHelper.Action(actionName, null, null, null, excludeFromParentCache);
         }
@@ -34,7 +33,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="routeValues">An object that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
         /// <returns>The child action result as an HTML string.</returns>
-        public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, object routeValues, bool excludeFromParentCache)
+        public static MvcHtmlString Action(this HtmlHelper htmlHelper, string actionName, object routeValues, bool excludeFromParentCache)
         {
             return htmlHelper.Action(actionName, null, null, new RouteValueDictionary(routeValues), excludeFromParentCache);
         }
@@ -47,7 +46,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="routeValues">A dictionary that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
         /// <returns>The child action result as an HTML string.</returns>
-        public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, RouteValueDictionary routeValues, bool excludeFromParentCache)
+        public static MvcHtmlString Action(this HtmlHelper htmlHelper, string actionName, RouteValueDictionary routeValues, bool excludeFromParentCache)
         {
             return htmlHelper.Action(actionName, null, null, routeValues, excludeFromParentCache);
         }
@@ -60,7 +59,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
         /// <returns>The child action result as an HTML string.</returns>
-        public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, bool excludeFromParentCache)
+        public static MvcHtmlString Action(this HtmlHelper htmlHelper, string actionName, string controllerName, bool excludeFromParentCache)
         {
             return htmlHelper.Action(actionName, controllerName, null, null, excludeFromParentCache);
         }
@@ -75,7 +74,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="routeValues">An object that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
         /// <returns>The child action result as an HTML string.</returns>
-        public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, [AspMvcAreaAttribute] string controllerArea,
+        public static MvcHtmlString Action(this HtmlHelper htmlHelper, string actionName, string controllerName, string controllerArea,
             object routeValues, bool excludeFromParentCache)
         {
             return htmlHelper.Action(actionName, controllerName, controllerArea, new RouteValueDictionary(routeValues), excludeFromParentCache);
@@ -88,7 +87,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="actionName">The name of the child action method to invoke.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
 
-        public static void RenderAction(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, bool excludeFromParentCache)
+        public static void RenderAction(this HtmlHelper htmlHelper, string actionName, bool excludeFromParentCache)
         {
             RenderAction(htmlHelper, actionName, null, null, null, excludeFromParentCache);
         }
@@ -101,7 +100,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="routeValues">A dictionary that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
 
-        public static void RenderAction(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, object routeValues, bool excludeFromParentCache)
+        public static void RenderAction(this HtmlHelper htmlHelper, string actionName, object routeValues, bool excludeFromParentCache)
         {
             RenderAction(htmlHelper, actionName, null, null, new RouteValueDictionary(routeValues), excludeFromParentCache);
         }
@@ -113,7 +112,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="actionName">The name of the child action method to invoke.</param>
         /// <param name="routeValues">A dictionary that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>        
-        public static void RenderAction(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, RouteValueDictionary routeValues, bool excludeFromParentCache)
+        public static void RenderAction(this HtmlHelper htmlHelper, string actionName, RouteValueDictionary routeValues, bool excludeFromParentCache)
         {
             RenderAction(htmlHelper, actionName, null, null, routeValues, excludeFromParentCache);
         }
@@ -125,7 +124,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="actionName">The name of the child action method to invoke.</param>
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>        
-        public static void RenderAction(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, bool excludeFromParentCache)
+        public static void RenderAction(this HtmlHelper htmlHelper, string actionName, string controllerName, bool excludeFromParentCache)
         {
             RenderAction(htmlHelper, actionName, controllerName, null, null, excludeFromParentCache);
         }
@@ -139,7 +138,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="controllerArea">The area of the controller that contains the action method.</param>
         /// <param name="routeValues">A dictionary that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
-        public static void RenderAction(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, [AspMvcAreaAttribute] string controllerArea,
+        public static void RenderAction(this HtmlHelper htmlHelper, string actionName, string controllerName, string controllerArea,
             object routeValues, bool excludeFromParentCache)
         {
             RenderAction(htmlHelper, actionName, controllerName, controllerArea, new RouteValueDictionary(routeValues), excludeFromParentCache);
@@ -154,7 +153,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="controllerArea">The area of the controller that contains the action method.</param>
         /// <param name="routeValues">A dictionary that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
-        public static void RenderAction(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, [AspMvcAreaAttribute] string controllerArea,
+        public static void RenderAction(this HtmlHelper htmlHelper, string actionName, string controllerName, string controllerArea,
             RouteValueDictionary routeValues, bool excludeFromParentCache)
         {
             var routeValuesWithArea = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
@@ -183,7 +182,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="routeValues">A dictionary that contains the parameters for a route. You can use routeValues to provide the parameters that are bound to the action method parameters. The routeValues parameter is merged with the original route values and overrides them.</param>
         /// <param name="excludeFromParentCache">A flag that determines whether the action should be excluded from any parent cache.</param>
         /// <returns>The child action result as an HTML string.</returns>
-        public static MvcHtmlString Action(this HtmlHelper htmlHelper, [AspMvcAction] string actionName, [AspMvcController] string controllerName, [AspMvcAreaAttribute] string controllerArea,
+        public static MvcHtmlString Action(this HtmlHelper htmlHelper, string actionName, string controllerName, string controllerArea,
             RouteValueDictionary routeValues, bool excludeFromParentCache)
         {
             var routeValuesWithArea = GetCopyOfRouteValueDictionaryWithControllerAreaValue(routeValues, controllerArea);
@@ -199,7 +198,7 @@ namespace DevTrends.MvcDonutCaching
         }
 
         private static RouteValueDictionary GetCopyOfRouteValueDictionaryWithControllerAreaValue(
-            RouteValueDictionary routeValues, [AspMvcAreaAttribute] string controllerArea)
+            RouteValueDictionary routeValues, string controllerArea)
         {
             if (routeValues == null)
                 return null;

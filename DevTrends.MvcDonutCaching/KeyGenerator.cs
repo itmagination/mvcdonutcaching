@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -32,7 +31,6 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="context">The controller context.</param>
         /// <param name="cacheSettings">The cache settings.</param>
         /// <returns>A string that can be used as an output cache key</returns>
-        [CanBeNull]
         public string GenerateKey(ControllerContext context, CacheSettings cacheSettings)
         {
             var routeData = context.RouteData;

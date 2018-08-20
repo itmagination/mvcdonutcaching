@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Caching;
@@ -62,7 +61,7 @@ namespace DevTrends.MvcDonutCaching
         /// </summary>
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="actionName">The name of the controller action method.</param>
-        public void RemoveItem([AspMvcController] string controllerName, [AspMvcAction] string actionName)
+        public void RemoveItem(string controllerName, string actionName)
         {
             RemoveItem(controllerName, actionName, null);
         }
@@ -73,7 +72,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="actionName">The name of the controller action method.</param>
         /// <param name="routeValues">An object that contains the parameters for a route.</param>
-        public void RemoveItem([AspMvcController] string controllerName, [AspMvcAction] string actionName, object routeValues)
+        public void RemoveItem(string controllerName, string actionName, object routeValues)
         {
             RemoveItem(controllerName, actionName, new RouteValueDictionary(routeValues));
         }
@@ -84,7 +83,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="actionName">The name of the controller action method.</param>
         /// <param name="routeValues">A dictionary that contains the parameters for a route.</param>
-        public void RemoveItem([AspMvcController] string controllerName, [AspMvcAction] string actionName, RouteValueDictionary routeValues)
+        public void RemoveItem(string controllerName, string actionName, RouteValueDictionary routeValues)
         {
             var key = _keyBuilder.BuildKey(controllerName, actionName, routeValues);
 
@@ -103,7 +102,7 @@ namespace DevTrends.MvcDonutCaching
         /// Removes all output cache entries for the specified controller.
         /// </summary>
         /// <param name="controllerName">The name of the controller.</param>
-        public void RemoveItems([AspMvcController] string controllerName)
+        public void RemoveItems(string controllerName)
         {
             RemoveItems(controllerName, null, null);
         }
@@ -113,7 +112,7 @@ namespace DevTrends.MvcDonutCaching
         /// </summary>
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="actionName">The name of the controller action method.</param>
-        public void RemoveItems([AspMvcController] string controllerName, [AspMvcAction] string actionName)
+        public void RemoveItems(string controllerName, string actionName)
         {
             RemoveItems(controllerName, actionName, null);
         }
@@ -124,7 +123,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="actionName">The name of the controller action method.</param>
         /// <param name="routeValues">An object that contains the parameters for a route.</param>
-        public void RemoveItems([AspMvcController] string controllerName, [AspMvcAction] string actionName, object routeValues)
+        public void RemoveItems(string controllerName, string actionName, object routeValues)
         {
             RemoveItems(controllerName, actionName, new RouteValueDictionary(routeValues));
         }
@@ -135,7 +134,7 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="controllerName">The name of the controller that contains the action method.</param>
         /// <param name="actionName">The name of the controller action method.</param>
         /// <param name="routeValues">A dictionary that contains the parameters for a route.</param>
-        public void RemoveItems([AspMvcController] string controllerName, [AspMvcAction] string actionName, RouteValueDictionary routeValues)
+        public void RemoveItems(string controllerName, string actionName, RouteValueDictionary routeValues)
         {
             var enumerableCache = _outputCacheProvider as IEnumerable<KeyValuePair<string, object>>;
             
